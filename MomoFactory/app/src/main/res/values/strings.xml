@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Momo Factory</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+    <string name="logout">Logout</string>
+    <string name="welcome">Welcome</string>
+    <string name="admin_panel">Admin Panel</string>
+</resources>

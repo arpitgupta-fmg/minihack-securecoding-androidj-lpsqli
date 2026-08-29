@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minihack - Android Secure Coding Challenge</title>
+
+    <!-- ============================================================
+    FONTS & ICONS
+    ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6100;
+            --primary-dark: #e05500;
+            --primary-light: #ff8a33;
+            --primary-glow: rgba(255, 97, 0, 0.35);
+            --dark: #0f1419;
+            --dark-card: #1a1f2e;
+            --dark-surface: #232838;
+            --text-primary: #f0f2f5;
+            --text-secondary: #9aa3b5;
+            --text-muted: #6b7488;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --success: #34c759;
+            --danger: #ff3b30;
+            --warning: #ff9500;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(255, 97, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(255, 97, 0, 0.05) 0%, transparent 50%);
+        }
+
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 50px 60px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%,
+            100% {
+                background-position: -200% 0;
+            }
+            50% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .header {
+            text-align: center;
+            padding: 10px 0 30px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 35px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 97, 0, 0.15);
+            color: var(--primary-light);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 97, 0, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .header-badge i {
+            font-size: 14px;
+        }
+
+        .logo-wrapper {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            line-height: 90px;
+            font-size: 44px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 40px var(--primary-glow);
+            animation: pulse-glow 3s ease-in-out infinite;
+            transition: transform var(--transition);
+        }
+
+        .logo-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse-glow {
+            0%,
+            100% {
+                box-shadow: 0 0 30px var(--primary-glow);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--primary-glow), 0 0 90px rgba(255, 97, 0, 0.15);
+            }
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 60%, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        .header .subtitle i {
+            color: var(--primary);
+            margin: 0 4px;
+        }
+
+        .tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--dark-surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .tag i {
+            font-size: 12px;
+        }
+        .tag .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .tag .dot.java {
+            background: #f89820;
+        }
+        .tag .dot.sql {
+            background: #4479a1;
+        }
+        .tag .dot.android {
+            background: #3ddc84;
+        }
+        .tag .dot.security {
+            background: var(--danger);
+        }
+
+        /* ============================================================
+           SECTION
+           ============================================================ */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 97, 0, 0.15);
+            color: var(--primary);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-content {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .section-content strong {
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           INFO BOXES
+           ============================================================ */
+        .info-box {
+            padding: 18px 22px;
+            border-radius: var(--radius-sm);
+            margin: 12px 0;
+            border-left: 4px solid var(--primary);
+            background: rgba(255, 97, 0, 0.06);
+        }
+
+        .info-box.warning {
+            border-left-color: var(--warning);
+            background: rgba(255, 149, 0, 0.06);
+        }
+
+        .info-box.success {
+            border-left-color: var(--success);
+            background: rgba(52, 199, 89, 0.06);
+        }
+
+        .info-box.danger {
+            border-left-color: var(--danger);
+            background: rgba(255, 59, 48, 0.06);
+        }
+
+        .info-box .box-icon {
+            margin-right: 10px;
+        }
+
+        /* ============================================================
+           GRID
+           ============================================================ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 12px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 12px 0;
+        }
+
+        /* ============================================================
+           VULNERABILITY CARDS
+           ============================================================ */
+        .vuln-card {
+            background: var(--dark-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 20px 22px;
+            transition: all var(--transition);
+        }
+
+        .vuln-card:hover {
+            border-color: rgba(255, 97, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .vuln-card .vuln-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .vuln-card .vuln-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+            flex-shrink: 0;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .vuln-card .vuln-title {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        .vuln-card .vuln-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .vuln-card .vuln-desc code {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .vuln-card .vuln-fix {
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vuln-card .vuln-fix i {
+            font-size: 14px;
+        }
+
+      
+       
+
+        /* ============================================================
+           COMMAND BOX
+           ============================================================ */
+        .command-box {
+            background: var(--dark);
+            border-radius: var(--radius-sm);
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-box .prompt {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .command-box .cmd {
+            color: #dcdcaa;
+        }
+
+        .command-box .cmd i {
+            color: var(--text-muted);
+            margin-right: 6px;
+        }
+
+        .command-box .output {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ============================================================
+           CODE BLOCK
+           ============================================================ */
+        .code-block {
+            background: var(--dark);
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            color: #e0e0e0;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+        .code-block .keyword {
+            color: #c586c0;
+        }
+        .code-block .string {
+            color: #ce9178;
+        }
+        .code-block .function {
+            color: #dcdcaa;
+        }
+        .code-block .type {
+            color: #4ec9b0;
+        }
+
+        /* ============================================================
+           STEPS / TIMELINE
+           ============================================================ */
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 14px 0 14px 56px;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .steps li:last-child {
+            border-bottom: none;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 97, 0, 0.15);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .steps li strong {
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           TAGS INLINE
+           ============================================================ */
+        .inline-tag {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .inline-tag.java {
+            background: rgba(248, 152, 32, 0.2);
+            color: #f89820;
+        }
+        .inline-tag.sql {
+            background: rgba(68, 121, 161, 0.2);
+            color: #4479a1;
+        }
+        .inline-tag.android {
+            background: rgba(61, 220, 132, 0.2);
+            color: #3ddc84;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 992px) {
+            .container {
+                padding: 35px 30px;
+            }
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+            .container {
+                padding: 25px 18px;
+                border-radius: 12px;
+            }
+            .header h1 {
+                font-size: 26px;
+            }
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .scoring-table {
+                font-size: 12px;
+            }
+            .scoring-table thead th,
+            .scoring-table tbody td {
+                padding: 8px 10px;
+            }
+            .command-box {
+                flex-wrap: wrap;
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+            .logo-wrapper {
+                width: 70px;
+                height: 70px;
+                line-height: 70px;
+                font-size: 34px;
+            }
+            .section-title {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 18px 12px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .tags {
+                gap: 6px;
+            }
+            .tag {
+                font-size: 10px;
+                padding: 3px 10px;
+            }
+            .vuln-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ============================================================
+        HEADER
+        ============================================================ -->
+
+        <header class="header">
+            <div class="header-badge">
+                <i class="fas fa-shield-alt"></i> Cybersecurity - Mobile Security Challenge
+            </div>
+            
+            <h1>Minihack - Android Secure Coding Challenge</h1>
+            <p class="subtitle">
+                <i class="fas fa-code"></i> Android Secure Code Review &amp; Vulnerability Fix
+            </p>
+
+            <div class="tags">
+                <span class="tag"><span class="dot android"></span> Android</span>
+                <span class="tag"><span class="dot java"></span> Java</span>
+                <span class="tag"><span class="dot security"></span> Security</span>
+                <span class="tag"><i class="fas fa-star" style="color:var(--warning);"></i> 3 Tests</span>
+            </div>
+        </header>
+
+        <!-- ============================================================
+        OVERVIEW
+        ============================================================ -->
+
+        <section class="section">
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-bullseye"></i></span>
+                Challenge Overview
+            </div>
+            <div class="section-content">
+                <p style="font-size: 16px; line-height: 1.8;">
+                    Welcome to the <strong>Minihack - Android Security Coding Challenge</strong>!
+                    You are given a fully functional Android app called <strong>MomoFactory</strong>
+                    — a food delivery app for momos. However, the app contains
+                    <strong style="color: var(--danger);">critical security vulnerabilities</strong>
+                    that need to be identified and fixed.
+                </p>
+
+                <div class="info-box" style="margin-top: 16px;">
+                    <i class="fas fa-bullseye box-icon" style="color: var(--primary);"></i>
+                    <strong>Your Goal:</strong> Find and fix all security vulnerabilities in the MomoFactory app.
+                    Your fixes will be validated automatically when you run the tests.
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        ABOUT THE APP
+        ============================================================ -->
+
+        <section class="section">
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-mobile-alt"></i></span>
+                About the App
+            </div>
+            <div class="section-content">
+                <p><strong>MomoFactory</strong> is a simple food delivery app with the following features:</p>
+
+                <div class="grid-2" style="margin-top: 12px;">
+                    <div style="background: var(--dark-surface); padding: 16px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: #fff;">User Registration</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Sign up with username, password, and address</div>
+                    </div>
+                    <div style="background: var(--dark-surface); padding: 16px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+
+                        <div style="font-weight: 600; color: #fff;">User Login</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Authenticate existing users</div>
+                    </div>
+                    <div style="background: var(--dark-surface); padding: 16px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+
+                        <div style="font-weight: 600; color: #fff;">Dashboard</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">View profile and membership status (Regular / Pro)</div>
+                    </div>
+                    <div style="background: var(--dark-surface); padding: 16px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+
+                        <div style="font-weight: 600; color: #fff;">Admin Panel</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Hidden admin functionality <span style="color: var(--danger);"></span></div>
+                    </div>
+                </div>
+
+                <div class="info-box warning" style="margin-top: 12px;">
+                    <i class="fas fa-exclamation-triangle box-icon" style="color: var(--warning);"></i>
+                    <strong>Note:</strong> The app is intentionally vulnerable. Your task is to find and fix the security issues.
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        VULNERABILITIES
+        ============================================================ -->
+
+       <!-- ============================================================
+VULNERABILITIES (Implicit Hints)
+============================================================ -->
+
+<section class="section">
+    <div class="section-title">
+        <span class="icon"><i class="fas fa-lock-open"></i></span>
+        What's Wrong?
+    </div>
+    <div class="section-content">
+        <p>
+            The app appears to work correctly, but something isn't right. 
+            Explore the code and see if you can spot the issues.
+        </p>
+
+        <div class="grid-2" style="margin-top: 14px;">
+
+            <!-- Hint 1 -->
+            <div class="vuln-card" style="border-left: 3px solid var(--warning);">
+                <div class="vuln-header">
+                    <span style="font-size: 18px;">🔍</span>
+                    <span class="vuln-title">Look Closely at the Manifest</span>
+                </div>
+                <div class="vuln-desc">
+                    The app asks for more than it needs. 
+                    A food delivery app only requires internet access and location.
+                </div>
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                    <strong>Think:</strong> Does a momo delivery app really need camera and contacts?
+                </div>
+            </div>
+
+            <!-- Hint 2 -->
+            <div class="vuln-card" style="border-left: 3px solid var(--warning);">
+                <div class="vuln-header">
+                    <span style="font-size: 18px;">🚪</span>
+                    <span class="vuln-title">Who Can Access What?</span>
+                </div>
+                <div class="vuln-desc">
+                    Some screens in the app are meant to be private. 
+                    But are they really?
+                </div>
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                    <strong>Think:</strong> Should the admin panel be accessible from outside the app?
+                </div>
+            </div>
+
+            <!-- Hint 3 -->
+            <div class="vuln-card" style="border-left: 3px solid var(--danger);">
+                <div class="vuln-header">
+                    <span style="font-size: 18px;">💉</span>
+                    <span class="vuln-title">Login Seems Too Easy</span>
+                </div>
+                <div class="vuln-desc">
+                    Try logging in with: <code style="background: var(--dark); padding: 2px 8px; border-radius: 4px;">' OR '1'='1' --</code>
+                    as the username. What happens?
+                </div>
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                    <strong>Think:</strong> How is the SQL query being built? Is it safe?
+                </div>
+            </div>
+
+            <!-- Hint 4 -->
+            <div class="vuln-card" style="border-left: 3px solid var(--danger);">
+                <div class="vuln-header">
+                    <span style="font-size: 18px;">👑</span>
+                    <span class="vuln-title">Becoming a "Pro" User</span>
+                </div>
+                <div class="vuln-desc">
+                    Try signing up with a username that might break the SQL query.
+                    Can you become a <strong style="color: var(--primary);">Pro</strong> member without paying?
+                </div>
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                    <strong>Think:</strong> What happens if the username contains SQL code?
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+      
+        <!-- ============================================================
+        HOW TO RUN TESTS
+        ============================================================ -->
+
+        <section class="section">
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-terminal"></i></span>
+		What To Do After Fix?
+            </div>  
+            <div class="section-content">
+            <ul class="steps" style="margin-top: 6px;">
+                    <li><strong>Compile and build</strong> your project</li>
+                    <li>Run the <strong>MomoFactory app</strong> in an emulator</li>
+           </ul>
+           <br>		
+            </div>
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-terminal"></i></span>
+                How to Run Tests
+            </div>
+            <div class="section-content">
+                <p>After fixing the vulnerabilities, run the following command in the terminal:</p>
+
+                <div class="command-box">
+                    <span class="prompt">$</span>
+                    <span class="cmd"><i class="fas fa-play"></i> run tests</span>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <p><strong>Example output:</strong></p>
+                    <div class="code-block">
+
+   Passed: 2
+   Failed: 1
+   Total:  2/3
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- ============================================================
+        RESOURCES
+        ============================================================ -->
+
+        <section class="section">
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-folder-open"></i></span>
+                Resources
+            </div>
+            <div class="section-content">
+                <div class="grid-3" style="margin-top: 4px;">
+                    <div style="background: var(--dark-surface); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: #fff; font-size: 15px;">
+                            <i class="fas fa-folder" style="color: var(--primary); margin-right: 8px;"></i> Environment Related Queries
+                        </div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                            /home/labuser/minihack-securecoding-androidj-LPSQLi/<strong>ChallengeInstructions.pdf</strong>
+                        </div>
+                    </div>
+                    <div style="background: var(--dark-surface); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: #fff; font-size: 15px;">
+                            <i class="fas fa-folder" style="color: var(--primary); margin-right: 8px;"></i> Project Location
+                        </div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                            /home/labuser/minihack-securecoding-androidj-LPSQLi/<strong>MomoFactory</strong>
+                        </div>
+                    </div>
+                    <div style="background: var(--dark-surface); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: #fff; font-size: 15px;">
+                            <i class="fas fa-rocket" style="color: var(--success); margin-right: 8px;"></i> Test Command
+                        </div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                            run tests
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SUBMISSION
+        ============================================================ -->
+
+        <section class="section" style="margin-bottom: 0;">
+            <div class="section-title">
+                <span class="icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                Submission
+            </div>
+            <div class="section-content">
+                <div class="info-box success" style="border-left-color: var(--success); background: rgba(52, 199, 89, 0.06);">
+                    <i class="fas fa-check-circle box-icon" style="color: var(--success);"></i>
+                    <strong>Your work is automatically validated!</strong>
+                </div>
+
+                <p style="margin-top: 12px;">
+                    When you run <code>run tests</code>, your code is automatically tested.
+                    You can run this command as many times as you want.
+                    Once you pass <strong>all 3 tests</strong>, you have successfully completed the challenge!
+                </p>
+
+                <div class="info-box" style="margin-top: 12px; border-left-color: var(--primary);">
+                    <i class="fas fa-info-circle box-icon" style="color: var(--primary);"></i>
+                    <strong>Note:</strong> There is no separate submission process.
+                    Your final score is the result of your last test run.
+                </div>
+
+        <!-- ============================================================
+        FOOTER
+        ============================================================ -->
+
+        <footer style="text-align: center; padding-top: 30px; margin-top: 35px; border-top: 1px solid var(--border-color); font-size: 14px; color: var(--text-muted);">
+            <p>
+                <i class="fas fa-code" style="color: var(--primary);"></i>
+               Minihack - Android Secure Coding Challenge &bull; Android Secure Code Review
+            </p>
+            <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                🥟 Made with <i class="fas fa-heart" style="color: var(--danger);"></i> for learning Android Security
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- ============================================================
+    SCRIPT: Animate score bar on scroll
+    ============================================================ -->
+    <script>
+        // Animate the score bar when it comes into view
+        const scoreBar = document.querySelector('.score-bar');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Get the width from the style attribute or default to 0
+                    const currentWidth = scoreBar.style.width || '0%';
+                    // Animate to 0% (since this is before any tests are run)
+                    scoreBar.style.width = '0%';
+                    // Then animate to show some progress
+                    setTimeout(() => {
+                        // This will be dynamically updated by the test runner
+                        // For demo purposes, we just show the initial state
+                    }, 300);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        if (scoreBar) {
+            observer.observe(scoreBar);
+        }
+
+        // Update progress from testcase.txt if it exists (simulated)
+        // In a real environment, this would read from the file
+        console.log('MomoFactory Security Challenge loaded!');
+        console.log('Run "run tests" to validate your fixes.');
+    </script>
+
+</body>
+</html>

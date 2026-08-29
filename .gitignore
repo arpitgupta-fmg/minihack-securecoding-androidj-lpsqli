@@ -1,0 +1,28 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Generated / build
+bin/
+gen/
+out/
+release/
+build/
+.gradle/
+.cxx/
+.externalNativeBuild/
+captures/
+
+# Local SDK path
+local.properties
+
+# IDE
+*.iml
+.idea/
+
+# OS
+.DS_Store
