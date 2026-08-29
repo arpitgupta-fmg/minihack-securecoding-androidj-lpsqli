@@ -60,12 +60,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         User user = null;
         try {
+            // Parameterized query: user input is bound as arguments, never
+            // concatenated into the SQL, so it cannot be interpreted as code.
             String sql = "SELECT * FROM " + TABLE_USERS + " WHERE "
-                    + COLUMN_USERNAME + " = '" + username + "' AND "
-                    + COLUMN_PASSWORD + " = '" + password + "'";
+                    + COLUMN_USERNAME + " = ? AND "
+                    + COLUMN_PASSWORD + " = ?";
 
-            Log.d("DatabaseHelper", "Login SQL: " + sql);
-            Cursor cursor = db.rawQuery(sql, null);
+            Cursor cursor = db.rawQuery(sql, new String[]{username, password});
 
             if (cursor.moveToFirst()) {
                 user = new User();
@@ -88,12 +89,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean addUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String sql = "INSERT INTO " + TABLE_USERS + "("
-                    + COLUMN_USERNAME + "," + COLUMN_PASSWORD + "," + COLUMN_ADDRESS
-                    + ") VALUES ('" + user.getUsername() + "', '" + user.getPassword() + "', '" + user.getAddress() + "')";
+            // ContentValues binds each field as a parameter, so a username
+            // containing SQL (e.g. to set isPro) is stored as literal text.
+            android.content.ContentValues values = new android.content.ContentValues();
+            values.put(COLUMN_USERNAME, user.getUsername());
+            values.put(COLUMN_PASSWORD, user.getPassword());
+            values.put(COLUMN_ADDRESS, user.getAddress());
 
-            db.execSQL(sql);
-            return true;
+            long rowId = db.insertOrThrow(TABLE_USERS, null, values);
+            return rowId != -1;
         } catch (Exception e) {
             Log.e("DatabaseHelper", "Error: " + e.getMessage());
             return false;
